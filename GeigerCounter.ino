@@ -19,6 +19,16 @@
  * Please use freely with attribution. Thank you!
 */
 
+/* 
+ *  Connections:
+ *  Arduino         
+ *  Pin 10    TX of Wifi Module
+ *  Pin 11    RX of Wifi Module
+ *  Pin 2     Gieger Counter Vin
+ *  3.3 V     Vcc,EN of Wifi Module
+ *  5V        Vcc Of Geiger Counter
+ *  GND       GND of Wifi Module,Geiger Counter
+ */
 
 #include <SPI.h>
 #include <SoftwareSerial.h>//for making virtual serial port for esp8266
