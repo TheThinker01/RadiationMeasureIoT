@@ -20,16 +20,22 @@
 */
 
 /* 
- *  Connections:
+ * **************************** Connections: ***********************
+ * 
  *  Arduino         
  *  Pin 10    TX of Wifi Module
  *  Pin 11    RX of Wifi Module
  *  Pin 2     Gieger Counter Vin
+ *  Pin 9     Buzzer(+) connected Pin 9 via a 330Ohm-1kOhm resistor 
  *  3.3 V     Vcc,EN of Wifi Module
- *  SDA,SCL   SDA and SCL Of LCD
- *  5V        Vcc Of Geiger Counter,Vcc of LCD
- *  GND       GND of Wifi Module,Geiger Counter
+ *  SDA,SCL   SDA and SCL Of LCD(0x27),SDA and SCL of MPU 6050 (0x68 with AD0 as low)
+ *  5V        Vcc Of Geiger Counter,Vcc of LCD,Vcc of MPU6050
+ *  GND       GND of Wifi Module,Geiger Counter,GND of Buzzer,MPU6050, AD0 of MPU6050
+ *  
+ * 
+ * ******************************************************************
  */
+ 
 /* *********************** LIBRARIES ************************ */
 #include <SPI.h>
 #include <SoftwareSerial.h>//for making virtual serial port for esp8266
@@ -101,7 +107,7 @@ int8_t ch ;//Just a dummy variable which I am Using for Now untill proper unlock
 int securityUnlock()
 {
   ch++;
-  if(ch==7){ lcd.clear();lcd.print("DEVICE UNLOCKED"); return 1;}
+  if(ch>7){ lcd.clear();lcd.print("DEVICE UNLOCKED"); return 1;}
   return 0;
 }
 
