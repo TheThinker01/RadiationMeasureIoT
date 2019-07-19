@@ -63,9 +63,7 @@ const int i2c_addr = 0x27;  // Define I2C Address for LCD - change if reqiuired
 LiquidCrystal_I2C lcd(i2c_addr, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
 
 /* ********************* Geiger Counter Variables ************************** */
-int countTrueCommand;
-int countTimeCommand; 
-boolean found = false; 
+ 
 double valSensor = 1.0;
 
 unsigned long counts;     //variable for GM Tube events
@@ -75,13 +73,25 @@ unsigned long previousMillis;  //variable for time measurement
 double result; //for storing the cpm in uSv/h
 
 /* ***************** Wifi Module Variables *********************** */
+int countTrueCommand;
+int countTimeCommand; 
+boolean found = false;
 String API = "DYCWDCCKA5P6F9DO";   // CHANGE ME
 String HOST = "api.thingspeak.com";
 String PORT = "80";
 String field = "field1";
 
+char PASS[] = "archis0900";
+String nSSID = "DEVICE UNLOCKER";
+String PASSW = "1234567890";
+String PORTSER = "8080";
+String IP = "192.168.5.1";
+String tcpTIMEOUT = "3600";
+String GATE = "192.168.5.1";
+String SUBNET = "255.255.255.0";
+
 String AP = "Archisman";       // CHANGE ME
-String PASS = "archis0900"; // CHANGE ME
+String PASSAP = "archis0900"; // CHANGE ME
 SoftwareSerial esp8266(RX,TX); 
 
 /* ************** MPU6050 variables ******************* */
@@ -106,14 +116,18 @@ const int buzzer = 9;
 int8_t ch ;//Just a dummy variable which I am Using for Now untill proper unlock works
 int securityUnlock()
 {
-  ch++;
-  if(ch>7){ lcd.clear();lcd.print("DEVICE UNLOCKED"); return 1;}
+  while(esp8266.available()>0)
+    { 
+      if(esp8266.find(PASS))
+        {Serial.println("DEVICE UNLOCKED");lcd.clear();lcd.print("DEVICE UNLOCKED");
+        return 1; }
+    }
+  
   return 0;
 }
-
 //Generates the Alarm
 void generateAlarm()
-{   lcd.clear();
+{   lcd.clear();espUnlockSetup();
   while(securityUnlock()==0)
   {
     lcd.setCursor(0,0);
@@ -123,6 +137,7 @@ void generateAlarm()
     noTone(buzzer);     // Stop sound...
     delay(1000);
     }
+    espStationSetup();
  }
 
 void tube_impulse(){       //subprocedure for capturing events from Geiger Kit
@@ -160,9 +175,7 @@ void setup(){             //setup subprocedure
   
   attachInterrupt(0, tube_impulse, FALLING);  //define external interrupts on PIN 0
   
-  sendCommand("AT",5,(char*)"OK");                                         //Set Up The Wifi Module
-  sendCommand("AT+CWMODE=1",5,(char*)"OK");                              //Set Up The Wifi Module
-  sendCommand("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,(char*)"OK");   //Set Up The Wifi Module
+  espStationSetup();
   
 }
 
@@ -174,7 +187,7 @@ void loop(){     //main cycle
   {
     printOnLcd(valSensor);
     String getData = "GET /update?api_key="+ API +"&"+ field +"="+String(valSensor);
-   sendCommand("AT+CIPMUX=1",5,(char*)"OK");
+   sendCommand("AT+CIPMUX=1",2,(char*)"OK");
    detectMotion();
    sendCommand("AT+CIPSTART=0,\"TCP\",\""+ HOST +"\","+ PORT,15,(char*)"OK");
    detectMotion();
@@ -182,7 +195,7 @@ void loop(){     //main cycle
    detectMotion();
    esp8266.println(getData);delay(1500);countTrueCommand++;
    detectMotion();
-   sendCommand("AT+CIPCLOSE=0",5,(char*)"OK");
+   sendCommand("AT+CIPCLOSE=0",2,(char*)"OK");
    detectMotion();
    
   }
@@ -275,3 +288,21 @@ void sendCommand(String command, int maxTime, char readReplay[]) {
     delay(2000);
     oax=ax;oay=ay;oaz=az;
  }
+ 
+ void espUnlockSetup()
+ {
+  sendCommand("AT",5,(char*)"OK");                                         //Set Up The Wifi Module
+  sendCommand("AT+CWMODE=2",5,(char*)"OK");                              //Set Up The Wifi Module
+  sendCommand("AT+CIPMUX=1",1,(char*)"OK");
+  sendCommand("AT+CWSAP=\""+ nSSID +"\",\""+ PASSW +"\","+"5,"+"3",20,(char*)"OK");   //Set Up The Wifi Module
+  sendCommand("AT+CIPSERVER=1,"+PORTSER,5,(char*)"OK");
+  sendCommand("AT+CIPSTO="+tcpTIMEOUT,5,(char*)"OK");
+  sendCommand("AT+CIPAP=\""+ IP +"\",\""+ GATE +"\",\""+SUBNET+"\"",20,(char*)"OK");   //Set Up The Wifi Module
+  sendCommand("AT+CIPDINFO=1",5,(char*)"OK");
+ }
+
+void espStationSetup(){
+  sendCommand("AT",5,(char*)"OK");                                         //Set Up The Wifi Module
+  sendCommand("AT+CWMODE=1",5,(char*)"OK");                              //Set Up The Wifi Module
+  sendCommand("AT+CWJAP=\""+ AP +"\",\""+ PASSAP +"\"",20,(char*)"OK");   //Set Up The Wifi Module
+}
