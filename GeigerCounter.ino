@@ -1,27 +1,7 @@
-/*
-* --------------------------------------------------------------------------------------
-* WHAT IS CPM?
-* CPM (or counts per minute) is events quantity from Geiger Tube you get during one minute. Usually it used to 
-* calculate a radiation level. Different GM Tubes has different quantity of CPM for background. Some tubes can produce
-* about 10-50 CPM for normal background, other GM Tube models produce 50-100 CPM or 0-5 CPM for same radiation level.
-* Please refer your GM Tube datasheet for more information. Just for reference here, J305 and SBM-20 can generate 
-* about 10-50 CPM for normal background. 
-* --------------------------------------------------------------------------------------
-* HOW TO CONNECT GEIGER KIT?
-* The kit 3 wires that should be connected to Arduino UNO board: 5V, GND and INT. PullUp resistor is included on
-* kit PCB. Connect INT wire to Digital Pin#2 (INT0), 5V to 5V, GND to GND. Then connect the Arduino with
-* USB cable to the computer and upload this sketch. 
-* 
- * Author:JiangJie Zhang * If you have any questions, please connect cajoetech@qq.com
- * 
- * License: MIT License
- * 
- * Please use freely with attribution. Thank you!
-*/
 
 /* 
  *  Connections:
- *  Arduino         
+ *  Arduino   Module        
  *  Pin 10    TX of Wifi Module
  *  Pin 11    RX of Wifi Module
  *  Pin 2     Gieger Counter Vin
@@ -29,7 +9,10 @@
  *  SDA,SCL   SDA and SCL Of LCD
  *  5V        Vcc Of Geiger Counter,Vcc of LCD
  *  GND       GND of Wifi Module,Geiger Counter
- */
+ * 
+ * Author: Archisman Pathak
+*/
+
 
 #include <SPI.h>
 #include <SoftwareSerial.h>//for making virtual serial port for esp8266
